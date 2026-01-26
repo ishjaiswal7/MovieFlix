@@ -1,6 +1,7 @@
 package com.movieflix.controller;
 
 import com.movieflix.dto.MovieDTO;
+import com.movieflix.exceptions.EmptyFileException;
 import com.movieflix.service.MovieService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,9 @@ public class MovieController {
     public ResponseEntity<MovieDTO> addMovieHandler(@RequestPart MultipartFile file,
                                                     @RequestPart String movieDto) throws IOException {
 
+        if(file.isEmpty()) {
+            throw new EmptyFileException("File is empty! Please send another file");
+        }
         MovieDTO dto = convertToMovieDTO(movieDto);
         return new ResponseEntity<>(movieService.addMovie(dto, file), HttpStatus.CREATED);
 
