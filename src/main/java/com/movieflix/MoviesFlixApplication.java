@@ -10,4 +10,8 @@ public class MoviesFlixApplication {
 		SpringApplication.run(MoviesFlixApplication.class, args);
 	}
 
+	/*
+	* netstat -ano | findstr :8080
+	* taskkill /PID <PID> /F
+	 */
 }
