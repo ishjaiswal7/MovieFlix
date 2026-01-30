@@ -1,21 +1,25 @@
 package com.movieflix.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.movieflix.dto.MovieDTO;
 import com.movieflix.dto.MoviePageResponse;
 import com.movieflix.exceptions.EmptyFileException;
 import com.movieflix.service.MovieService;
+
 import com.movieflix.ulils.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/movie")
+@CrossOrigin(origins = "*")
 public class MovieController {
 
     private final MovieService movieService;
@@ -24,6 +28,7 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/add-movie")
     public ResponseEntity<MovieDTO> addMovieHandler(@RequestPart MultipartFile file,
                                                     @RequestPart String movieDto) throws IOException {
@@ -79,7 +84,7 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getAllMoviesWithPaginationAndSorting(pageNumber, pageSize, sortBy, sortDir));
     }
 
-    private  MovieDTO convertToMovieDTO(String movieDtoObj) {
+    private  MovieDTO convertToMovieDTO(String movieDtoObj) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(movieDtoObj, MovieDTO.class);
     }
