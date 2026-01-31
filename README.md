@@ -33,101 +33,74 @@ operations, pagination, sorting, and poster image uploads.
 
 ------------------------------------------------------------------------
 
-## 🏗 Tech Stack
+## 🚀 Tech Stack
 
-  Layer           Technology
-  --------------- -----------------------
-  Backend         Spring Boot
-  Security        Spring Security + JWT
-  Database        MySQL
-  ORM             Hibernate / JPA
-  Build Tool      Maven
-  File Handling   Multipart File Upload
-  JSON Mapping    Jackson
+|  Layer        |  Technology|
+|  -------------- |-----------------------------|
+|  Backend     |   Spring Boot|
+|  Security      | Spring Security + JWT|
+|  Database      | MySQL |
+|  ORM           | Spring Data JPA (Hibernate) |
+|  Build Tool    | Maven |
+|  File Storage  | Local File System |
+|  API Format    | REST (JSON + Multipart) |
+<br>
 
-------------------------------------------------------------------------
 
-## 🔑 Authentication APIs
+## 🔐 Authentication Flow
 
-  Method   Endpoint                Description
-  -------- ----------------------- ---------------------------
-  POST     /api/v1/auth/register   Register new user
-  POST     /api/v1/auth/login      Login user
-  POST     /api/v1/auth/refresh    Generate new access token
+1.  User registers → account created
+2.  User logs in → receives:
+    -   Access Token (JWT)
+    -   Refresh Token
+3.  When access token expires → use refresh token to get new one
+<br>
 
-### Login Response
 
-{ "accessToken": "JWT_TOKEN", "refreshToken": "REFRESH_TOKEN" }
+## 🧾Controllers & Endpoints
 
-Use access token in headers:
+| Method | Endpoint | Description | Layer | Technology |
+|--------|----------|-------------|-------|------------|
+| POST | /api/v1/auth/register | Register a new user | Controller | Spring Boot REST |
+| POST | /api/v1/auth/login | User login | Controller | Spring Boot REST, JWT |
+| POST | /api/v1/auth/refresh | Refresh JWT token | Controller | Spring Boot REST, JWT |
+| POST | /api/v1/movie/add-movie | Add new movie (Admin only) | Controller | Spring Boot REST, MultipartFile |
+| GET | /api/v1/movie/{movieId} | Get movie by ID | Controller | Spring Boot REST |
+| GET | /api/v1/movie/all | Get all movies | Controller | Spring Boot REST |
+| PUT | /api/v1/movie/update/{movieId} | Update movie details | Controller | Spring Boot REST, MultipartFile |
+| DELETE | /api/v1/movie/delete/{movieId} | Delete a movie | Controller | Spring Boot REST |
+| GET | /api/v1/movie/allMoviesPage | Get movies with pagination | Controller | Spring Boot REST, Pageable |
+| GET | /api/v1/movie/allMoviesPageSort | Get movies with pagination & sorting | Controller | Spring Boot REST, Pageable, Sort |
+| POST | /file/upload | Upload a movie poster | Controller | Spring Boot REST, MultipartFile |
+| GET | /file/{fileName} | Serve movie poster | Controller | Spring Boot REST |
 
-Authorization: Bearer `<accessToken>`{=html}
+<br>
 
-------------------------------------------------------------------------
+## Exception Handling
+- `EmptyFileException` – thrown when an uploaded file is empty.
+- Runtime exceptions for invalid or expired refresh tokens.
 
-## 🎬 Movie APIs
+## Usage
+1. Clone the repository.
+2. Configure database settings in `application.properties`.
+3. Run the application using `mvn spring-boot:run`.
+4. Use Postman or similar tools to test the REST endpoints.
 
-Base URL: /api/v1/movie
+<br>
 
-  Method   Endpoint             Role Required   Description
-  -------- -------------------- --------------- -----------------------
-  POST     /add-movie           ADMIN           Add movie with poster
-  GET      /{movieId}           Authenticated   Get movie by ID
-  GET      /all                 Authenticated   Get all movies
-  PUT      /update/{movieId}    ADMIN           Update movie
-  DELETE   /delete/{movieId}    ADMIN           Delete movie
-  GET      /allMoviesPage       Authenticated   Pagination
-  GET      /allMoviesPageSort   Authenticated   Pagination + Sorting
+## 🛡 Security Notes
 
-------------------------------------------------------------------------
+-   Access token is short-lived
+-   Refresh token stored in DB
+-   Only ADMIN can add/update/delete movies
+-   File uploads validated for empty files
 
-## 📤 Add Movie Request (Multipart)
 
-Content-Type: multipart/form-data
+<br>
 
-  Key        Type
-  ---------- -------------
-  file       Image File
-  movieDto   JSON string
+## 📌 Future Improvements
 
-Example:
-
-{ "title": "Avengers Endgame", "director": "Russo Brothers", "studio":
-"Marvel Studios", "movieCast": \["RDJ", "Chris Evans"\], "releaseYear":
-2019 }
-
-------------------------------------------------------------------------
-
-## 🖼 File APIs
-
-  Method   Endpoint           Description
-  -------- ------------------ ---------------
-  POST     /file/upload       Upload poster
-  GET      /file/{fileName}   View poster
-
-------------------------------------------------------------------------
-
-## 🔒 Security Rules
-
-  Role    Permissions
-  ------- ----------------------------
-  USER    View movies
-  ADMIN   Add, update, delete movies
-
-------------------------------------------------------------------------
-
-## ▶️ Running the Project
-
-mvn spring-boot:run
-
-App runs on:
-
-http://localhost:8080
-
-------------------------------------------------------------------------
-
-## 👨‍💻 Author
-
-Ish\
-Full-stack developer passionate about Spring Boot & scalable backend
-systems 🚀
+-   Cloud file storage (AWS S3)
+-   Redis for token blacklist
+-   Swagger API docs
+-   Docker deployment
